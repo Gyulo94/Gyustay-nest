@@ -12,9 +12,10 @@ import { RoleGuard } from './auth/guards/role.guard';
 import { CommonModule } from './common/common.module';
 import { RequestMiddleware } from './common/utils/logger.middleware';
 import { UserModule } from './user/user.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), CommonModule, AuthModule, UserModule],
+  imports: [ConfigModule.forRoot(), CommonModule, AuthModule, UserModule, RoomModule],
   controllers: [],
   providers: [
     {

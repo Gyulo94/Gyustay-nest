@@ -19,11 +19,57 @@ enum Role {
 }
 
 model User {
-  id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email    String  @unique
-  name     String?
-  password String
-  image    String?
-  provider String  @default("credentials")
-  role     Role    @default(USER)
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String  @unique
+  name        String?
+  password    String
+  image       String?
+  description String?
+  provider    String  @default("credentials")
+  role        Role    @default(USER)
+
+  rooms Room[]
+}
+
+model Room {
+  id                 Int      @id @default(autoincrement())
+  title              String
+  address            String
+  lat                String
+  lng                String
+  description        String
+  price              Int
+  bedroomDescription String?
+  freeCancel         Boolean  @default(false)
+  selfCheckIn        Boolean  @default(false)
+  officeSpace        Boolean  @default(false)
+  hasMountainsView   Boolean  @default(false)
+  hasShampoo         Boolean  @default(false)
+  hasFreeLaundry     Boolean  @default(false)
+  hasAirConditioner  Boolean  @default(false)
+  hasWifi            Boolean  @default(false)
+  hasBarbeque        Boolean  @default(false)
+  hasFreeParking     Boolean  @default(false)
+  categoryId         String   @db.Uuid
+  userId             String?  @db.Uuid
+  category           Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user               User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images             Image[]
+
+  @@index([userId])
+}
+
+model Category {
+  id    String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name  String @unique
+  rooms Room[]
+}
+
+model Image {
+  id     String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  url    String
+  roomId Int
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
 }
