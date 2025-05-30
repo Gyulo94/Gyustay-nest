@@ -1,17 +1,78 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RoomFilterDto } from './dto/room-filter.dto';
 
 @Injectable()
 export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findRoomsAll() {
-    return this.prisma.room.findMany({
-      include: {
-        user: true,
-        category: true,
-        images: true,
-      },
-    });
+  async findRoomsAll(dto: RoomFilterDto) {
+    const { category, page, limit } = dto;
+    if (page) {
+      const count = await this.prisma.room.count();
+      const rooms = await this.prisma.room.findMany({
+        orderBy: {
+          id: 'asc',
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        where: {
+          category: {
+            name: category,
+          },
+        },
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              email: true,
+            },
+          },
+          images: {
+            select: {
+              url: true,
+            },
+          },
+        },
+      });
+      return {
+        page,
+        data: rooms,
+        totalCount: count,
+        totalPage: Math.ceil(count / limit),
+      };
+    } else {
+      return {
+        data: await this.prisma.room.findMany({
+          include: {
+            category: {
+              select: {
+                name: true,
+              },
+            },
+            user: {
+              select: {
+                id: true,
+                name: true,
+                image: true,
+                email: true,
+              },
+            },
+            images: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        }),
+      };
+    }
   }
 }
