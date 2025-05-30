@@ -73,3 +73,9 @@ model Image {
 
   @@index([roomId])
 }
+
+model Faq {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+}

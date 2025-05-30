@@ -55,6 +55,19 @@ async function seedCategories() {
   });
 }
 
+async function seedFags() {
+  Array.from({ length: 10 }, (v, i) => i).forEach(async () => {
+    const faqData = {
+      title: faker.lorem.words(),
+      description: faker.lorem.paragraph(),
+    };
+    const response = await prisma.faq.create({
+      data: faqData,
+    });
+    console.log(response);
+  });
+}
+
 async function seedRooms() {
   const totalUsers = await prisma.user.findMany();
   const totalCategories = await prisma.category.findMany();
@@ -135,9 +148,10 @@ function getRandomLongitude() {
 }
 
 async function main() {
-  await seedUsers();
-  await seedCategories();
-  await seedRooms();
+  // await seedUsers();
+  // await seedCategories();
+  // await seedRooms();
+  await seedFags();
 }
 
 main()
