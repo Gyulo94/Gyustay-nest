@@ -12,4 +12,10 @@ export class RoomController {
   async findRoomsAll(@Query() dto: RoomFilterDto) {
     return this.roomService.findRoomsAll(dto);
   }
+
+  @Public()
+  @Get('/map')
+  async findRoomsInMap() {
+    return this.roomService.findRoomsAll();
+  }
 }

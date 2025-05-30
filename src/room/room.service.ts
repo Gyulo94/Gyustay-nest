@@ -6,8 +6,8 @@ import { RoomFilterDto } from './dto/room-filter.dto';
 export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findRoomsAll(dto: RoomFilterDto) {
-    const { category, page, limit } = dto;
+  async findRoomsAll(dto?: RoomFilterDto) {
+    const { category, page, limit } = dto ?? {};
     if (page) {
       const count = await this.prisma.room.count();
       const rooms = await this.prisma.room.findMany({
