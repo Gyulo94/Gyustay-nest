@@ -13,9 +13,10 @@ import { CommonModule } from './common/common.module';
 import { RequestMiddleware } from './common/utils/logger.middleware';
 import { UserModule } from './user/user.module';
 import { RoomModule } from './room/room.module';
+import { FileModule } from './file/file.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), CommonModule, AuthModule, UserModule, RoomModule],
+  imports: [ConfigModule.forRoot(), CommonModule, AuthModule, UserModule, RoomModule, FileModule],
   controllers: [],
   providers: [
     {

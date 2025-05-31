@@ -17,6 +17,9 @@ export enum ErrorCode {
   // 숙소 관련 에러
   ROOM_NOT_FOUND = 'ROOM_001',
 
+  // 이미지 관련 에러
+  IMAGE_NOT_FOUND = 'IMAGE_001',
+
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
   BAD_REQUEST = 'COMMON_001',
@@ -71,6 +74,12 @@ export const ErrorCodeMap: Record<
   [ErrorCode.ROOM_NOT_FOUND]: {
     status: HttpStatus.NOT_FOUND,
     message: '해당 숙소를 찾을 수 없습니다.',
+  },
+
+  // 이미지 관련
+  [ErrorCode.IMAGE_NOT_FOUND]: {
+    status: HttpStatus.NOT_FOUND,
+    message: '이미지를 찾을 수 없습니다.',
   },
 
   // 기타 일반
