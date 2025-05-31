@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RoomFilterDto } from './dto/room-filter.dto';
 import { RoomService } from './room.service';
@@ -17,5 +17,11 @@ export class RoomController {
   @Get('/map')
   async findRoomsInMap() {
     return this.roomService.findRoomsAll();
+  }
+
+  @Public()
+  @Get('/:id')
+  async findRoomById(@Param('id') id: string) {
+    return this.roomService.findRoomById(id);
   }
 }

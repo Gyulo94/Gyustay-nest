@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
+import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RoomFilterDto } from './dto/room-filter.dto';
 
@@ -74,5 +76,37 @@ export class RoomService {
         }),
       };
     }
+  }
+
+  async findRoomById(id: string) {
+    const room = await this.prisma.room.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            email: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+    if (!room) {
+      throw new ApiException(ErrorCode.ROOM_NOT_FOUND);
+    }
+    return room;
   }
 }

@@ -14,6 +14,9 @@ export enum ErrorCode {
   SAME_ORIGINAL_PASSWORD = 'USER_004',
   NOT_ALLOWED_SOCIAL_USER = 'USER_005',
 
+  // 숙소 관련 에러
+  ROOM_NOT_FOUND = 'ROOM_001',
+
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
   BAD_REQUEST = 'COMMON_001',
@@ -62,6 +65,12 @@ export const ErrorCodeMap: Record<
   [ErrorCode.SAME_ORIGINAL_PASSWORD]: {
     status: HttpStatus.CONFLICT,
     message: '기존 비밀번호와 동일합니다.',
+  },
+
+  // 숙소 관련
+  [ErrorCode.ROOM_NOT_FOUND]: {
+    status: HttpStatus.NOT_FOUND,
+    message: '해당 숙소를 찾을 수 없습니다.',
   },
 
   // 기타 일반
