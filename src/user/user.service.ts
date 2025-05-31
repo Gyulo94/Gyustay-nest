@@ -60,4 +60,22 @@ export class UserService {
     }
     return user;
   }
+
+  async getMe(userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.USER_NOT_FOUND);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        image: true,
+        description: true,
+        provider: true,
+      },
+    });
+
+    return user;
+  }
 }
