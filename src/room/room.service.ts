@@ -78,7 +78,7 @@ export class RoomService {
     }
   }
 
-  async findRoomById(id: string) {
+  async findRoomById(id: string, userId?: string) {
     const room = await this.prisma.room.findUnique({
       where: {
         id: parseInt(id),
@@ -88,6 +88,9 @@ export class RoomService {
           select: {
             name: true,
           },
+        },
+        likes: {
+          where: userId ? { userId } : {},
         },
         user: {
           select: {

@@ -16,6 +16,7 @@ import { RequestMiddleware } from './common/utils/logger.middleware';
 import { FileModule } from './file/file.module';
 import { RoomModule } from './room/room.module';
 import { UserModule } from './user/user.module';
+import { LikeModule } from './like/like.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UserModule } from './user/user.module';
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads/',
     }),
+    LikeModule,
   ],
   controllers: [],
   providers: [

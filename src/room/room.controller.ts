@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Query } from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RoomFilterDto } from './dto/room-filter.dto';
 import { RoomService } from './room.service';
@@ -21,7 +21,7 @@ export class RoomController {
 
   @Public()
   @Get('/:id')
-  async findRoomById(@Param('id') id: string) {
-    return this.roomService.findRoomById(id);
+  async findRoomById(@Param('id') id: string, @Body('userId') userId?: string) {
+    return this.roomService.findRoomById(id, userId);
   }
 }

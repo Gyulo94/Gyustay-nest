@@ -29,6 +29,7 @@ model User {
   role        Role    @default(USER)
 
   rooms Room[]
+  likes Like[]
 }
 
 model Room {
@@ -52,9 +53,11 @@ model Room {
   hasFreeParking     Boolean  @default(false)
   categoryId         String   @db.Uuid
   userId             String?  @db.Uuid
+  createdAt          DateTime @default(now())
   category           Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   user               User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   images             Image[]
+  likes              Like[]
 
   @@index([userId])
 }
@@ -78,4 +81,15 @@ model Faq {
   id          Int    @id @default(autoincrement())
   title       String
   description String
+}
+
+model Like {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  userId    String   @db.Uuid
+  roomId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([userId, roomId])
 }
