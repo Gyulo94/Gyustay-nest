@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { compareSync, hashSync } from 'bcrypt';
+import * as fs from 'fs';
+import * as path from 'path';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
 import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -77,5 +79,84 @@ export class UserService {
     });
 
     return user;
+  }
+
+  async editUser(dto: UpdateUserDto, userId: string) {
+    const { name, description, image } = dto;
+    if (!userId) {
+      throw new ApiException(ErrorCode.REQUIRED_LOGIN);
+    }
+
+    return this.prisma.$transaction(async (prisma) => {
+      const updateUser = await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          name,
+          description,
+        },
+      });
+
+      if (
+        !image ||
+        image === updateUser.image ||
+        !image.includes('/uploads/temp/')
+      ) {
+        return null;
+      }
+
+      if (updateUser.image && updateUser.image !== image) {
+        try {
+          const oldImagePath = updateUser.image.replace(
+            `${process.env.SERVER_URL}/`,
+            '',
+          );
+          const oldImageFullPath = path.join(process.cwd(), oldImagePath);
+          if (fs.existsSync(oldImageFullPath)) {
+            await fs.promises.unlink(oldImageFullPath);
+          }
+        } catch (error) {
+          throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+        }
+      }
+
+      const updateUserId = updateUser.id;
+      const userDir = path.join(process.cwd(), 'uploads/users', updateUserId);
+      if (!fs.existsSync(userDir)) {
+        fs.mkdirSync(userDir, { recursive: true });
+      }
+
+      const imageFilename = path.basename(image);
+      const ext = path.extname(imageFilename);
+      const newImageFilename = `${updateUser.name}_${Date.now()}${ext}`;
+      const imageTempPath = path.join(
+        process.cwd(),
+        'uploads/temp',
+        imageFilename,
+      );
+
+      const imageFinalPath = path.join(userDir, newImageFilename);
+
+      if (!fs.existsSync(imageTempPath)) {
+        return null;
+      }
+
+      try {
+        await fs.promises.rename(imageTempPath, imageFinalPath);
+        const userImagePath = `${process.env.SERVER_URL}/uploads/users/${updateUserId}/${newImageFilename}`;
+        const newUser = await prisma.user.update({
+          where: {
+            id: userId,
+          },
+          data: {
+            image: userImagePath,
+          },
+        });
+        return newUser;
+      } catch (error) {
+        throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+      }
+    });
   }
 }

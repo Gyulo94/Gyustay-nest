@@ -19,6 +19,7 @@ export enum ErrorCode {
 
   // 이미지 관련 에러
   IMAGE_NOT_FOUND = 'IMAGE_001',
+  IMAGE_FILES_MOVE_ERROR = 'IMAGE_002',
 
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
@@ -80,6 +81,10 @@ export const ErrorCodeMap: Record<
   [ErrorCode.IMAGE_NOT_FOUND]: {
     status: HttpStatus.NOT_FOUND,
     message: '이미지를 찾을 수 없습니다.',
+  },
+  [ErrorCode.IMAGE_FILES_MOVE_ERROR]: {
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    message: '이미지 파일 이동 중 오류가 발생했습니다.',
   },
 
   // 기타 일반
