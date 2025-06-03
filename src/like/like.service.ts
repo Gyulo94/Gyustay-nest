@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
 import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { LikeFilterDto } from './dto/like-filter.dto';
 
 @Injectable()
 export class LikeService {
@@ -26,7 +27,7 @@ export class LikeService {
         message: '찜 목록에서 삭제되었습니다.',
       };
     } else {
-      const created = await this.prisma.like.create({
+      await this.prisma.like.create({
         data: {
           roomId,
           userId,
@@ -36,5 +37,47 @@ export class LikeService {
         message: '찜 목록에 추가되었습니다.',
       };
     }
+  }
+
+  async findLikesAllByUserId(dto: LikeFilterDto, userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const { page, limit } = dto;
+    const totalCount = await this.prisma.like.count({
+      where: {
+        userId,
+      },
+    });
+    const likes = await this.prisma.like.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+      where: {
+        userId,
+      },
+      include: {
+        room: {
+          include: {
+            images: {
+              select: {
+                url: true,
+              },
+            },
+            category: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return {
+      page,
+      data: likes,
+      totalCount,
+      totalPage: Math.ceil(totalCount / limit),
+    };
   }
 }

@@ -21,8 +21,14 @@ export class CommentController {
   @Public()
   @Get('all')
   findCommentsByRoomId(@Query() dto: commentFilterDto) {
-    console.log('dto', dto);
-
     return this.commentService.findCommentsByRoomId(dto);
+  }
+
+  @Get('all/userId')
+  findCommentsAllByUserId(
+    @Query() dto: commentFilterDto,
+    @CurrentUser() user: Payload,
+  ) {
+    return this.commentService.findCommentsAllByUserId(dto, user.id);
   }
 }

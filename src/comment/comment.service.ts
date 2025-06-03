@@ -78,4 +78,55 @@ export class CommentService {
       };
     }
   }
+
+  async findCommentsAllByUserId(dto: commentFilterDto, userId: string) {
+    const { limit, page } = dto;
+
+    if (page) {
+      const comments = await this.prisma.comment.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+      const totalCount = await this.prisma.comment.count();
+      return {
+        page,
+        data: comments,
+        totalCount,
+        totalPage: Math.ceil(totalCount / limit),
+      };
+    } else {
+      const totalCount = await this.prisma.comment.count();
+      const comments = await this.prisma.comment.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+      return {
+        data: comments,
+        totalCount,
+      };
+    }
+  }
 }
