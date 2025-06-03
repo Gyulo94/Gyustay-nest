@@ -1,0 +1,81 @@
+import { Injectable } from '@nestjs/common';
+import { ErrorCode } from 'src/common/enum/error-code.enum';
+import { ApiException } from 'src/common/exception/api.exception';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { commentFilterDto } from './dto/comment-filter.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
+
+@Injectable()
+export class CommentService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async createComment(dto: CreateCommentDto, userId: string) {
+    const { roomId, content } = dto;
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const comment = await this.prisma.comment.create({
+      data: {
+        content,
+        roomId,
+        userId,
+      },
+    });
+    return comment;
+  }
+
+  async findCommentsByRoomId(dto: commentFilterDto) {
+    const { roomId, limit, page } = dto;
+
+    if (page) {
+      const comments = await this.prisma.comment.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: limit,
+        skip: (page - 1) * limit,
+        where: roomId ? { roomId } : {},
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+      const totalCount = await this.prisma.comment.count({
+        where: roomId ? { roomId } : {},
+      });
+      return {
+        page,
+        data: comments,
+        totalCount,
+        totalPage: Math.ceil(totalCount / limit),
+      };
+    } else {
+      const totalCount = await this.prisma.comment.count({
+        where: roomId ? { roomId } : {},
+      });
+      const comments = await this.prisma.comment.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        where: roomId ? { roomId } : {},
+        take: limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+      });
+      return {
+        data: comments,
+        totalCount,
+      };
+    }
+  }
+}

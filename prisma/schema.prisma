@@ -28,12 +28,13 @@ model User {
   provider    String  @default("credentials")
   role        Role    @default(USER)
 
-  rooms Room[]
-  likes Like[]
+  rooms    Room[]
+  likes    Like[]
+  comments Comment[]
 }
 
 model Room {
-  id                 Int      @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   title              String
   address            String
   lat                String
@@ -41,23 +42,24 @@ model Room {
   description        String
   price              Int
   bedroomDescription String?
-  freeCancel         Boolean  @default(false)
-  selfCheckIn        Boolean  @default(false)
-  officeSpace        Boolean  @default(false)
-  hasMountainsView   Boolean  @default(false)
-  hasShampoo         Boolean  @default(false)
-  hasFreeLaundry     Boolean  @default(false)
-  hasAirConditioner  Boolean  @default(false)
-  hasWifi            Boolean  @default(false)
-  hasBarbeque        Boolean  @default(false)
-  hasFreeParking     Boolean  @default(false)
-  categoryId         String   @db.Uuid
-  userId             String?  @db.Uuid
-  createdAt          DateTime @default(now())
-  category           Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  user               User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  freeCancel         Boolean   @default(false)
+  selfCheckIn        Boolean   @default(false)
+  officeSpace        Boolean   @default(false)
+  hasMountainsView   Boolean   @default(false)
+  hasShampoo         Boolean   @default(false)
+  hasFreeLaundry     Boolean   @default(false)
+  hasAirConditioner  Boolean   @default(false)
+  hasWifi            Boolean   @default(false)
+  hasBarbeque        Boolean   @default(false)
+  hasFreeParking     Boolean   @default(false)
+  categoryId         String    @db.Uuid
+  userId             String?   @db.Uuid
+  createdAt          DateTime  @default(now())
+  category           Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user               User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   images             Image[]
   likes              Like[]
+  comments           Comment[]
 
   @@index([userId])
 }
@@ -81,6 +83,18 @@ model Faq {
   id          Int    @id @default(autoincrement())
   title       String
   description String
+}
+
+model Comment {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content   String
+  createdAt DateTime @default(now())
+  userId    String   @db.Uuid
+  roomId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([userId, roomId])
 }
 
 model Like {

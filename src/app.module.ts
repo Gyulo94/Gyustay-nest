@@ -17,6 +17,7 @@ import { FileModule } from './file/file.module';
 import { RoomModule } from './room/room.module';
 import { UserModule } from './user/user.module';
 import { LikeModule } from './like/like.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { LikeModule } from './like/like.module';
       serveRoot: '/uploads/',
     }),
     LikeModule,
+    CommentModule,
   ],
   controllers: [],
   providers: [
