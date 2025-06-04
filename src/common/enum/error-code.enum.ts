@@ -24,6 +24,9 @@ export enum ErrorCode {
   // 댓글 관련 에러
   COMMENT_NOT_FOUND = 'COMMENT_001',
 
+  // 예약 관련 에러
+  BOOKING_NOT_FOUND = 'BOOKING_001',
+
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
   BAD_REQUEST = 'COMMON_001',
@@ -94,6 +97,12 @@ export const ErrorCodeMap: Record<
   [ErrorCode.COMMENT_NOT_FOUND]: {
     status: HttpStatus.NOT_FOUND,
     message: '해당 후기를 찾을 수 없습니다.',
+  },
+
+  // 예약 관련
+  [ErrorCode.BOOKING_NOT_FOUND]: {
+    status: HttpStatus.NOT_FOUND,
+    message: '해당 예약을 찾을 수 없습니다.',
   },
 
   // 기타 일반

@@ -18,6 +18,7 @@ import { RoomModule } from './room/room.module';
 import { UserModule } from './user/user.module';
 import { LikeModule } from './like/like.module';
 import { CommentModule } from './comment/comment.module';
+import { BookingModule } from './booking/booking.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CommentModule } from './comment/comment.module';
     }),
     LikeModule,
     CommentModule,
+    BookingModule,
   ],
   controllers: [],
   providers: [
