@@ -1,10 +1,6 @@
 import { IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
-export class CommentFilterDto {
-  @IsNumber()
-  @IsOptional()
-  roomId: number;
-
+export class BookingFilterDto {
   @IsOptional()
   @IsNumber()
   page?: number;

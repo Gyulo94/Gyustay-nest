@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
 import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { commentFilterDto } from './dto/comment-filter.dto';
+import { CommentFilterDto } from './dto/comment-filter.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
@@ -23,7 +23,7 @@ export class CommentService {
     return comment;
   }
 
-  async findCommentsByRoomId(dto: commentFilterDto) {
+  async findCommentsByRoomId(dto: CommentFilterDto) {
     const { roomId, limit, page } = dto;
 
     if (page) {
@@ -80,11 +80,13 @@ export class CommentService {
     }
   }
 
-  async findCommentsAllByUserId(dto: commentFilterDto, userId: string) {
+  async findCommentsAllByUserId(dto: CommentFilterDto, userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
     const { limit, page } = dto;
 
     if (page) {
       const comments = await this.prisma.comment.findMany({
+        where: { userId },
         orderBy: {
           createdAt: 'desc',
         },

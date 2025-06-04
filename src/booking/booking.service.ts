@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
 import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { BookingFilterDto } from './dto/booking-filter.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 
 @Injectable()
@@ -36,13 +37,36 @@ export class BookingService {
     return booking;
   }
 
-  async findBookingsAll() {
-    await this.prisma.booking.findMany({
+  async findBookingsAll(dto: BookingFilterDto, userId: string) {
+    const { limit, page } = dto;
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const bookings = await this.prisma.booking.findMany({
+      where: { userId },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
       include: {
         user: true,
-        room: true,
+        room: {
+          include: {
+            category: true,
+            images: true,
+            comments: true,
+          },
+        },
       },
     });
+    const totalCount = await this.prisma.booking.count({
+      where: { userId },
+    });
+    return {
+      page,
+      data: bookings,
+      totalCount,
+      totalPage: Math.ceil(totalCount / limit),
+    };
   }
 
   async createBooking(dto: CreateBookingDto, userId: string) {

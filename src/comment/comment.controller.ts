@@ -14,7 +14,7 @@ import { Message } from 'src/common/decorator/message.decorator';
 import { ResponseMessage } from 'src/common/enum/response-message.enum';
 import { Payload } from 'src/common/utils/type';
 import { CommentService } from './comment.service';
-import { commentFilterDto } from './dto/comment-filter.dto';
+import { CommentFilterDto } from './dto/comment-filter.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 
@@ -30,13 +30,13 @@ export class CommentController {
 
   @Public()
   @Get('all')
-  findCommentsByRoomId(@Query() dto: commentFilterDto) {
+  findCommentsByRoomId(@Query() dto: CommentFilterDto) {
     return this.commentService.findCommentsByRoomId(dto);
   }
 
   @Get('all/userId')
   findCommentsAllByUserId(
-    @Query() dto: commentFilterDto,
+    @Query() dto: CommentFilterDto,
     @CurrentUser() user: Payload,
   ) {
     return this.commentService.findCommentsAllByUserId(dto, user.id);
