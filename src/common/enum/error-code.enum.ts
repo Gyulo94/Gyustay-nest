@@ -21,6 +21,9 @@ export enum ErrorCode {
   IMAGE_NOT_FOUND = 'IMAGE_001',
   IMAGE_FILES_MOVE_ERROR = 'IMAGE_002',
 
+  // 댓글 관련 에러
+  COMMENT_NOT_FOUND = 'COMMENT_001',
+
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
   BAD_REQUEST = 'COMMON_001',
@@ -85,6 +88,12 @@ export const ErrorCodeMap: Record<
   [ErrorCode.IMAGE_FILES_MOVE_ERROR]: {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     message: '이미지 파일 이동 중 오류가 발생했습니다.',
+  },
+
+  // 댓글 관련
+  [ErrorCode.COMMENT_NOT_FOUND]: {
+    status: HttpStatus.NOT_FOUND,
+    message: '해당 후기를 찾을 수 없습니다.',
   },
 
   // 기타 일반

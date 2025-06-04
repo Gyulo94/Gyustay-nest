@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { Message } from 'src/common/decorator/message.decorator';
@@ -7,6 +16,7 @@ import { Payload } from 'src/common/utils/type';
 import { CommentService } from './comment.service';
 import { commentFilterDto } from './dto/comment-filter.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Controller('comment')
 export class CommentController {
@@ -30,5 +40,26 @@ export class CommentController {
     @CurrentUser() user: Payload,
   ) {
     return this.commentService.findCommentsAllByUserId(dto, user.id);
+  }
+
+  @Get(':id')
+  findCommentById(@Param('id') id: string, @CurrentUser() user: Payload) {
+    return this.commentService.findCommentById(id, user.id);
+  }
+
+  @Put(':id')
+  @Message(ResponseMessage.COMMENT_UPDATE_SUCCESS)
+  updateComment(
+    @Param('id') id: string,
+    @Body() dto: UpdateCommentDto,
+    @CurrentUser() user: Payload,
+  ) {
+    return this.commentService.updateComment(id, dto, user.id);
+  }
+
+  @Delete(':id')
+  @Message(ResponseMessage.COMMENT_DELETE_SUCCESS)
+  deleteComment(@Param('id') id: string, @CurrentUser() user: Payload) {
+    return this.commentService.deleteComment(id, user.id);
   }
 }

@@ -4,6 +4,7 @@ import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { commentFilterDto } from './dto/comment-filter.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { UpdateCommentDto } from './dto/update-comment.dto';
 
 @Injectable()
 export class CommentService {
@@ -128,5 +129,46 @@ export class CommentService {
         totalCount,
       };
     }
+  }
+
+  async findCommentById(id: string, userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const comment = await this.prisma.comment.findUnique({
+      where: { id, userId },
+    });
+    if (!comment) {
+      throw new ApiException(ErrorCode.COMMENT_NOT_FOUND);
+    }
+    return comment;
+  }
+
+  async updateComment(id: string, dto: UpdateCommentDto, userId: string) {
+    const { content } = dto;
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const comment = await this.prisma.comment.findUnique({
+      where: { id, userId },
+    });
+    if (!comment) {
+      throw new ApiException(ErrorCode.COMMENT_NOT_FOUND);
+    }
+    const updatedComment = await this.prisma.comment.update({
+      where: { id, userId },
+      data: { content },
+    });
+    return updatedComment;
+  }
+
+  async deleteComment(id: string, userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const comment = await this.prisma.comment.findUnique({
+      where: { id, userId },
+    });
+    if (!comment) {
+      throw new ApiException(ErrorCode.COMMENT_NOT_FOUND);
+    }
+    await this.prisma.comment.delete({
+      where: { id, userId },
+    });
+    return null;
   }
 }
