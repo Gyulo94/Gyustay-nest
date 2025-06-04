@@ -11,4 +11,5 @@ export enum ResponseMessage {
   COMMENT_DELETE_SUCCESS = '후기가 삭제되었습니다.',
 
   BOOKING_CREATE_SUCCESS = '예약이 완료되었습니다.',
+  BOOKING_CANCEL_SUCCESS = '예약이 취소되었습니다.',
 }

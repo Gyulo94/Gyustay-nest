@@ -3,6 +3,7 @@ import { ErrorCode } from 'src/common/enum/error-code.enum';
 import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { BookingFilterDto } from './dto/booking-filter.dto';
+import { CancelBookingDto } from './dto/cancel-booking.dto';
 import { CreateBookingDto } from './dto/create-booking.dto';
 
 @Injectable()
@@ -83,5 +84,25 @@ export class BookingService {
     });
 
     return booking;
+  }
+
+  async cancelBooking(id: string, dto: CancelBookingDto, userId: string) {
+    const { status } = dto;
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const booking = await this.prisma.booking.findUnique({
+      where: { id, userId },
+    });
+    if (!booking) {
+      throw new ApiException(ErrorCode.BOOKING_NOT_FOUND);
+    }
+    if (booking.status === 'CANCELLED') {
+      throw new ApiException(ErrorCode.BOOKING_ALREADY_CANCELLED);
+    }
+    return this.prisma.booking.update({
+      where: { id, userId },
+      data: {
+        status,
+      },
+    });
   }
 }

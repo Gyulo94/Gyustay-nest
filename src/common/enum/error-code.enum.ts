@@ -26,6 +26,7 @@ export enum ErrorCode {
 
   // 예약 관련 에러
   BOOKING_NOT_FOUND = 'BOOKING_001',
+  BOOKING_ALREADY_CANCELLED = 'BOOKING_002',
 
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
@@ -103,6 +104,10 @@ export const ErrorCodeMap: Record<
   [ErrorCode.BOOKING_NOT_FOUND]: {
     status: HttpStatus.NOT_FOUND,
     message: '해당 예약을 찾을 수 없습니다.',
+  },
+  [ErrorCode.BOOKING_ALREADY_CANCELLED]: {
+    status: HttpStatus.BAD_REQUEST,
+    message: '이미 취소된 예약입니다.',
   },
 
   // 기타 일반
