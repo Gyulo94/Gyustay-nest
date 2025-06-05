@@ -124,10 +124,53 @@ model Booking {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   status      BookingStatus @default(PENDING)
+  payments    Payment[]
 }
 
 enum BookingStatus {
   SUCCESS
   PENDING
   CANCELLED
+  FAILED
+}
+
+model Payment {
+  id             String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bookingId      String        @db.Uuid
+  Booking        Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  paymentKey     String?
+  amount         Int
+  type           PaymentType?
+  orderId        String        @unique
+  orderName      String?
+  mId            String?
+  method         String?
+  status         PaymentStatus
+  requestedAt    String?
+  approvedAt     String?
+  cardNumber     String?
+  cardType       String?
+  receiptUrl     String?
+  checkoutUrl    String?
+  failureCode    String?
+  failureMessage String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+enum PaymentType {
+  NORMAL
+  BILLING
+  BRANDPAY
+}
+
+enum PaymentStatus {
+  READY
+  IN_PROGRESS
+  WAITING_FOR_DEPOSIT
+  DONE
+  CANCELLED
+  PARTIAL_CANCELLED
+  ABORTED
+  EXPIRED
 }

@@ -25,4 +25,7 @@ export class CreateBookingDto {
   @Type(() => Number)
   @IsNotEmpty()
   totalDays: number;
+
+  @IsNotEmpty()
+  status: 'SUCCESS' | 'PENDING' | 'CANCELLED' | 'FAILED';
 }

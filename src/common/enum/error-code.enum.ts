@@ -28,6 +28,9 @@ export enum ErrorCode {
   BOOKING_NOT_FOUND = 'BOOKING_001',
   BOOKING_ALREADY_CANCELLED = 'BOOKING_002',
 
+  // 결제 관련 에러
+  PAYMENT_NOT_FOUND = 'PAYMENT_001',
+
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
   BAD_REQUEST = 'COMMON_001',
@@ -108,6 +111,12 @@ export const ErrorCodeMap: Record<
   [ErrorCode.BOOKING_ALREADY_CANCELLED]: {
     status: HttpStatus.BAD_REQUEST,
     message: '이미 취소된 예약입니다.',
+  },
+
+  // 결제 관련
+  [ErrorCode.PAYMENT_NOT_FOUND]: {
+    status: HttpStatus.NOT_FOUND,
+    message: '해당 결제를 찾을 수 없습니다.',
   },
 
   // 기타 일반

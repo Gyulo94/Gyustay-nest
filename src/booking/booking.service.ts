@@ -24,6 +24,7 @@ export class BookingService {
             comments: true,
           },
         },
+        payments: true,
       },
     });
 
@@ -42,7 +43,7 @@ export class BookingService {
     const { limit, page } = dto;
     if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
     const bookings = await this.prisma.booking.findMany({
-      where: { userId },
+      where: { userId, NOT: { status: 'PENDING' } },
       orderBy: {
         createdAt: 'desc',
       },
@@ -57,6 +58,7 @@ export class BookingService {
             comments: true,
           },
         },
+        payments: true,
       },
     });
     const totalCount = await this.prisma.booking.count({
@@ -71,14 +73,11 @@ export class BookingService {
   }
 
   async createBooking(dto: CreateBookingDto, userId: string) {
-    console.log('Creating booking with:', dto);
-
     if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
 
     const booking = await this.prisma.booking.create({
       data: {
         userId,
-        status: 'SUCCESS',
         ...dto,
       },
     });
