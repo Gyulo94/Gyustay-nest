@@ -12,4 +12,6 @@ export enum ResponseMessage {
 
   BOOKING_CREATE_SUCCESS = '예약이 완료되었습니다.',
   BOOKING_CANCEL_SUCCESS = '예약이 취소되었습니다.',
+
+  ROOM_CREATE_SUCCESS = '숙소가 등록되었습니다.',
 }

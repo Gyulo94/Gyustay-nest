@@ -1,5 +1,10 @@
-import { Body, Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
+import { CurrentUser } from 'src/common/decorator/current-user.decorator';
+import { Message } from 'src/common/decorator/message.decorator';
+import { ResponseMessage } from 'src/common/enum/response-message.enum';
+import { Payload } from 'src/common/utils/type';
+import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomFilterDto } from './dto/room-filter.dto';
 import { RoomService } from './room.service';
 
@@ -23,5 +28,11 @@ export class RoomController {
   @Get('/:id')
   async findRoomById(@Param('id') id: string, @Body('userId') userId?: string) {
     return this.roomService.findRoomById(id, userId);
+  }
+
+  @Post()
+  @Message(ResponseMessage.ROOM_CREATE_SUCCESS)
+  async createRoom(@Body() dto: CreateRoomDto, @CurrentUser() user: Payload) {
+    return this.roomService.createRoom(dto, user.id);
   }
 }

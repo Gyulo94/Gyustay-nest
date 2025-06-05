@@ -31,6 +31,9 @@ export enum ErrorCode {
   // 결제 관련 에러
   PAYMENT_NOT_FOUND = 'PAYMENT_001',
 
+  // 카테고리 관련 에러
+  CATEGORY_NOT_FOUND = 'CATEGORY_001',
+
   // 기타 일반 에러
   INTERNAL_SERVER_ERROR = 'SERVER_001',
   BAD_REQUEST = 'COMMON_001',
@@ -117,6 +120,12 @@ export const ErrorCodeMap: Record<
   [ErrorCode.PAYMENT_NOT_FOUND]: {
     status: HttpStatus.NOT_FOUND,
     message: '해당 결제를 찾을 수 없습니다.',
+  },
+
+  // 카테고리 관련
+  [ErrorCode.CATEGORY_NOT_FOUND]: {
+    status: HttpStatus.NOT_FOUND,
+    message: '해당 카테고리를 찾을 수 없습니다.',
   },
 
   // 기타 일반
