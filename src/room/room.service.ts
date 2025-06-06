@@ -14,7 +14,7 @@ export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findRoomsAll(dto?: RoomFilterDto) {
-    const { category, page, limit } = dto;
+    const { category, location, page, limit } = dto;
     const count = await this.prisma.room.count();
     const rooms = await this.prisma.room.findMany({
       orderBy: {
@@ -26,6 +26,12 @@ export class RoomService {
         category: {
           name: category,
         },
+        address: location
+          ? {
+              contains: location,
+              mode: 'insensitive',
+            }
+          : {},
       },
       include: {
         category: {
@@ -116,11 +122,17 @@ export class RoomService {
   }
 
   async findRoomsByUserId(dto: RoomFilterDto, userId: string) {
-    const { category, page, limit } = dto;
+    const { category, page, limit, search } = dto;
     if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
     const count = await this.prisma.room.count({
       where: {
         userId,
+        title: search
+          ? {
+              contains: search,
+              mode: 'insensitive',
+            }
+          : {},
       },
     });
     const rooms = await this.prisma.room.findMany({
@@ -134,6 +146,12 @@ export class RoomService {
         category: {
           name: category,
         },
+        title: search
+          ? {
+              contains: search,
+              mode: 'insensitive',
+            }
+          : {},
       },
       include: {
         category: {
