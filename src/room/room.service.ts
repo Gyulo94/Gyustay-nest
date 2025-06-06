@@ -6,6 +6,7 @@ import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { RoomFilterDto } from './dto/room-filter.dto';
+import { UpdateRoomDto } from './dto/update-room.dto';
 
 @Injectable()
 export class RoomService {
@@ -87,11 +88,7 @@ export class RoomService {
         id: parseInt(id),
       },
       include: {
-        category: {
-          select: {
-            name: true,
-          },
-        },
+        category: true,
         likes: {
           where: userId ? { userId } : {},
         },
@@ -228,6 +225,69 @@ export class RoomService {
     });
   }
 
+  async updateRoom(id: number, dto: UpdateRoomDto, userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const { categoryId, images, ...rest } = dto;
+
+    return this.prisma.$transaction(async (prisma) => {
+      const category = await prisma.category.findUnique({
+        where: {
+          id: dto.categoryId,
+        },
+      });
+      if (!category) {
+        throw new ApiException(ErrorCode.CATEGORY_NOT_FOUND);
+      }
+      const room = await prisma.room.update({
+        where: { id, userId },
+        data: {
+          ...rest,
+          category: {
+            connect: { id: dto.categoryId },
+          },
+          user: {
+            connect: { id: userId },
+          },
+        },
+      });
+      const roomId = room.id.toString();
+      const imagesArr: string[] = await this.savedImages(roomId, images);
+
+      if (imagesArr.length > 0) {
+        await prisma.image.createMany({
+          data: imagesArr.map((url) => ({
+            url,
+            roomId: room.id,
+          })),
+        });
+      }
+
+      return prisma.room.findUnique({
+        where: { id: room.id },
+        include: {
+          category: {
+            select: {
+              name: true,
+            },
+          },
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+              email: true,
+            },
+          },
+          images: {
+            select: {
+              url: true,
+            },
+          },
+        },
+      });
+    });
+  }
+
   private async savedImages(id: string, images: string[]) {
     const existingImages = await this.prisma.image.findMany({
       where: { roomId: Number(id) },
@@ -249,37 +309,43 @@ export class RoomService {
       try {
         await fs.promises.unlink(imagePath);
       } catch (error) {
-        throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+        if (error.code !== 'ENOENT') {
+          throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+        }
       }
 
       await this.prisma.image.deleteMany({
-        where: { url: oldImageUrl, id },
+        where: { url: oldImageUrl, roomId: Number(id) },
       });
     }
 
     const movedImages = [];
-    const dir = path.join(process.cwd(), 'uploads/images', id);
+    const dir = path.join(process.cwd(), 'uploads/images/rooms', id);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
     for (const image of imagesToAdd) {
-      const imageFilename = path.basename(image);
-      const newImageFilename = `${id}_${Date.now()}_${imageFilename}`;
-      const imageTempPath = path.join(
-        process.cwd(),
-        'uploads/temp',
-        imageFilename,
-      );
-      const imageFinalPath = path.join(dir, newImageFilename);
-
-      try {
-        await fs.promises.rename(imageTempPath, imageFinalPath);
-        movedImages.push(
-          `${process.env.SERVER_URL}/uploads/images/rooms/${id}/${newImageFilename}`,
+      if (image.includes('/uploads/temp/')) {
+        const imageFilename = path.basename(image);
+        const newImageFilename = `${id}_${Date.now()}_${imageFilename}`;
+        const imageTempPath = path.join(
+          process.cwd(),
+          'uploads/temp',
+          imageFilename,
         );
-      } catch (error) {
-        throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+        const imageFinalPath = path.join(dir, newImageFilename);
+
+        try {
+          await fs.promises.rename(imageTempPath, imageFinalPath);
+          movedImages.push(
+            `${process.env.SERVER_URL}/uploads/images/rooms/${id}/${newImageFilename}`,
+          );
+        } catch (error) {
+          throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+        }
+      } else {
+        movedImages.push(image);
       }
     }
     return movedImages;
