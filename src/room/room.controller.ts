@@ -13,19 +13,26 @@ export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Public()
-  @Get('/all')
+  @Get('all')
   async findRoomsAll(@Query() dto: RoomFilterDto) {
     return this.roomService.findRoomsAll(dto);
   }
 
   @Public()
-  @Get('/map')
+  @Get('map')
   async findRoomsInMap() {
-    return this.roomService.findRoomsAll();
+    return this.roomService.findRoomsInMap();
+  }
+  @Get('userId')
+  async findRoomsByUserId(
+    @Query() dto: RoomFilterDto,
+    @CurrentUser() user: Payload,
+  ) {
+    return this.roomService.findRoomsByUserId(dto, user.id);
   }
 
   @Public()
-  @Get('/:id')
+  @Get(':id')
   async findRoomById(@Param('id') id: string, @Body('userId') userId?: string) {
     return this.roomService.findRoomById(id, userId);
   }

@@ -12,20 +12,51 @@ export class RoomService {
   constructor(private readonly prisma: PrismaService) {}
 
   async findRoomsAll(dto?: RoomFilterDto) {
-    const { category, page, limit } = dto ?? {};
-    if (page) {
-      const count = await this.prisma.room.count();
-      const rooms = await this.prisma.room.findMany({
-        orderBy: {
-          id: 'asc',
+    const { category, page, limit } = dto;
+    const count = await this.prisma.room.count();
+    const rooms = await this.prisma.room.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+      where: {
+        category: {
+          name: category,
         },
-        take: limit,
-        skip: (page - 1) * limit,
-        where: {
-          category: {
-            name: category,
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
           },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            email: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+    return {
+      page,
+      data: rooms,
+      totalCount: count,
+      totalPage: Math.ceil(count / limit),
+    };
+  }
+
+  async findRoomsInMap() {
+    return {
+      data: await this.prisma.room.findMany({
         include: {
           category: {
             select: {
@@ -46,39 +77,8 @@ export class RoomService {
             },
           },
         },
-      });
-      return {
-        page,
-        data: rooms,
-        totalCount: count,
-        totalPage: Math.ceil(count / limit),
-      };
-    } else {
-      return {
-        data: await this.prisma.room.findMany({
-          include: {
-            category: {
-              select: {
-                name: true,
-              },
-            },
-            user: {
-              select: {
-                id: true,
-                name: true,
-                image: true,
-                email: true,
-              },
-            },
-            images: {
-              select: {
-                url: true,
-              },
-            },
-          },
-        }),
-      };
-    }
+      }),
+    };
   }
 
   async findRoomById(id: string, userId?: string) {
@@ -115,6 +115,55 @@ export class RoomService {
       throw new ApiException(ErrorCode.ROOM_NOT_FOUND);
     }
     return room;
+  }
+
+  async findRoomsByUserId(dto: RoomFilterDto, userId: string) {
+    const { category, page, limit } = dto;
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const count = await this.prisma.room.count({
+      where: {
+        userId,
+      },
+    });
+    const rooms = await this.prisma.room.findMany({
+      orderBy: {
+        id: 'asc',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+      where: {
+        userId,
+        category: {
+          name: category,
+        },
+      },
+      include: {
+        category: {
+          select: {
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            email: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+          },
+        },
+      },
+    });
+    return {
+      page,
+      data: rooms,
+      totalCount: count,
+      totalPage: Math.ceil(count / limit),
+    };
   }
 
   async createRoom(dto: CreateRoomDto, userId: string) {
