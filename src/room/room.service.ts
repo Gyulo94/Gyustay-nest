@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Room } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ErrorCode } from 'src/common/enum/error-code.enum';
@@ -288,6 +289,29 @@ export class RoomService {
     });
   }
 
+  async deleteRoom(id: number, userId: string) {
+    if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+
+    return this.prisma.$transaction(async (prisma) => {
+      const room = await this.prisma.room.findUnique({
+        where: { id, userId },
+      });
+      if (!room) {
+        throw new ApiException(ErrorCode.ROOM_NOT_FOUND);
+      }
+
+      await prisma.image.deleteMany({
+        where: { roomId: id },
+      });
+
+      await this.deletedImages([room]);
+
+      await prisma.room.delete({
+        where: { id, userId },
+      });
+    });
+  }
+
   private async savedImages(id: string, images: string[]) {
     const existingImages = await this.prisma.image.findMany({
       where: { roomId: Number(id) },
@@ -349,5 +373,22 @@ export class RoomService {
       }
     }
     return movedImages;
+  }
+
+  private async deletedImages(rooms: Room[]) {
+    for (const room of rooms) {
+      const dir = path.join(
+        process.cwd(),
+        'uploads/images/rooms',
+        room.id.toString(),
+      );
+      try {
+        if (fs.existsSync(dir)) {
+          await fs.promises.rm(dir, { recursive: true, force: true });
+        }
+      } catch (error) {
+        throw new ApiException(ErrorCode.IMAGE_FILES_MOVE_ERROR);
+      }
+    }
   }
 }

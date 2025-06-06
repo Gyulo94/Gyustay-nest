@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
 import { Message } from 'src/common/decorator/message.decorator';
@@ -51,5 +60,11 @@ export class RoomController {
     @CurrentUser() user: Payload,
   ) {
     return this.roomService.updateRoom(+id, dto, user.id);
+  }
+
+  @Delete(':id')
+  @Message(ResponseMessage.ROOM_DELETE_SUCCESS)
+  async deleteRoom(@Param('id') id: string, @CurrentUser() user: Payload) {
+    return this.roomService.deleteRoom(+id, user.id);
   }
 }
