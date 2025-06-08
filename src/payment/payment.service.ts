@@ -11,6 +11,16 @@ export class PaymentService {
 
   async createPayment(dto: CreatePaymentDto, userId: string) {
     if (!userId) throw new ApiException(ErrorCode.UNAUTHORIZED);
+    const booking = await this.prisma.booking.findUnique({
+      where: {
+        id: dto.bookingId,
+        userId,
+      },
+    });
+    if (!booking) {
+      throw new ApiException(ErrorCode.BOOKING_NOT_FOUND);
+    }
+
     const payment = await this.prisma.payment.create({
       data: {
         ...dto,

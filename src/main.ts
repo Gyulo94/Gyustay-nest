@@ -22,7 +22,6 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalFilters(new HttpExceptionFilter(logger));
   app.useGlobalInterceptors(new ApiInterceptor(reflector));
-  console.log('실제 서버 포트:', process.env.PORT);
   await app.listen(parseInt(process.env.PORT ?? '8000', 10), '0.0.0.0');
 }
 bootstrap();

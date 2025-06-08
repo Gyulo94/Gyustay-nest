@@ -15,7 +15,13 @@ export class RoomService {
 
   async findRoomsAll(dto?: RoomFilterDto) {
     const { category, location, page, limit } = dto;
-    const count = await this.prisma.room.count();
+    const count = await this.prisma.room.count({
+      where: {
+        category: {
+          name: category,
+        },
+      },
+    });
     const rooms = await this.prisma.room.findMany({
       orderBy: {
         id: 'asc',

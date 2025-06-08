@@ -5,7 +5,7 @@ import { ResponseMessage } from 'src/common/enum/response-message.enum';
 import { Payload } from 'src/common/utils/type';
 import { EmailService } from 'src/email/email.service';
 import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { ResetPasswordDto } from 'src/user/dto/reset-password.dto';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorator/public.decorator';
@@ -29,7 +29,9 @@ export class AuthController {
 
   @Post('reset-password')
   @Message(ResponseMessage.RESET_PASSWORD_SUCCESS)
-  async resetPassword(@Body() dto: UpdateUserDto) {
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    console.log('dto', dto);
+
     return await this.userService.resetPassword(dto);
   }
 

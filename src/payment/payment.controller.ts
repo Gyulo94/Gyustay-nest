@@ -1,5 +1,7 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
 import { CurrentUser } from 'src/common/decorator/current-user.decorator';
+import { Message } from 'src/common/decorator/message.decorator';
+import { ResponseMessage } from 'src/common/enum/response-message.enum';
 import { Payload } from 'src/common/utils/type';
 import { ApprovePaymentDto } from './dto/approve-payment.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -10,6 +12,7 @@ export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   @Post()
+  @Message(ResponseMessage.PAYMENT_CREATE_SUCCESS)
   async createPayment(
     @Body() dto: CreatePaymentDto,
     @CurrentUser() user: Payload,
@@ -18,6 +21,7 @@ export class PaymentController {
   }
 
   @Put()
+  @Message(ResponseMessage.PAYMENT_APPROVE_SUCCESS)
   async approvePayment(
     @Body() dto: ApprovePaymentDto,
     @CurrentUser() user: Payload,

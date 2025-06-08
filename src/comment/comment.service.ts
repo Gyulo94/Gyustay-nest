@@ -26,6 +26,12 @@ export class CommentService {
   async findCommentsByRoomId(dto: CommentFilterDto) {
     const { roomId, limit, page } = dto;
 
+    const room = await this.prisma.room.findUnique({
+      where: { id: roomId },
+    });
+
+    if (!room) throw new ApiException(ErrorCode.ROOM_NOT_FOUND);
+
     if (page) {
       const comments = await this.prisma.comment.findMany({
         orderBy: {

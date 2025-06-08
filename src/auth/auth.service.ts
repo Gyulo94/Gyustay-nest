@@ -72,9 +72,9 @@ export class AuthService {
     const value = await this.redis.getData(token);
     if (value) {
       const email = value.split(':')[2];
-      return email;
+      return { email };
     } else {
-      throw new ApiException(ErrorCode.FORBIDDEN);
+      throw new ApiException(ErrorCode.VERIFICATION_EMAIL_TOKEN_FAILED);
     }
   }
 

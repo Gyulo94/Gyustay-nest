@@ -16,4 +16,7 @@ export enum ResponseMessage {
   ROOM_CREATE_SUCCESS = '숙소가 등록되었습니다.',
   ROOM_UPDATE_SUCCESS = '숙소가 수정되었습니다.',
   ROOM_DELETE_SUCCESS = '숙소가 삭제되었습니다.',
+
+  PAYMENT_CREATE_SUCCESS = '결제가 완료되었습니다.',
+  PAYMENT_APPROVE_SUCCESS = '결제가 승인되었습니다.',
 }

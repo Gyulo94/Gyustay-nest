@@ -44,9 +44,7 @@ export class EmailService {
     } else if (type === 'reset' && !user) {
       throw new NotFoundException('존재하지 않는 이메일 입니다.');
     } else if (type === 'reset' && user.provider !== 'credentials') {
-      throw new ApiException(
-        ErrorCode.NOT_ALLOWED_SOCIAL_USER,
-      );
+      throw new ApiException(ErrorCode.NOT_ALLOWED_SOCIAL_USER);
     }
 
     const token = uuid.v4();
@@ -128,7 +126,7 @@ export class EmailService {
             >
               하단 버튼을 누르시면 ${actionText} 계속 진행됩니다.
             </p>
-            <a href=${url} target=${'_self'} style="background: #404040;text-decoration: none;padding: 10px 24px;font-size: 18px;color: #fff;font-weight: 400;border-radius: 4px;">${buttonText}</a>
+            <a href=${url} target=${'_self'} style="background: #8e51ff;text-decoration: none;padding: 10px 24px;font-size: 18px;color: #fff;font-weight: 400;border-radius: 4px;">${buttonText}</a>
           </div>
         </div>
       `,

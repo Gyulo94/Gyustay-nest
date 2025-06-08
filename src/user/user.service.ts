@@ -7,6 +7,7 @@ import { ApiException } from 'src/common/exception/api.exception';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { RedisService } from 'src/redis/redis.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
@@ -18,7 +19,13 @@ export class UserService {
 
   async signup(dto: CreateUserDto) {
     const { token, provider, ...res } = dto;
-    const user = await this.prisma.user.create({
+    const user = await this.prisma.user.findUnique({
+      where: { email: res.email },
+    });
+    if (user) {
+      throw new ApiException(ErrorCode.USER_ALREADY_EXISTS);
+    }
+    const newUser = await this.prisma.user.create({
       data: {
         ...res,
         id: provider ? undefined : dto.id,
@@ -26,18 +33,30 @@ export class UserService {
         password: provider ? '' : await hashSync(dto.password, 10),
       },
     });
-    if (provider !== null) {
+    if (provider !== 'google' && provider !== 'kakao') {
+      const redisData = await this.redis.getData(token);
+      if (!redisData) {
+        throw new ApiException(ErrorCode.VERIFICATION_EMAIL_TOKEN_FAILED);
+      }
       await this.redis.deleteData(dto.token);
     }
+
     return user;
   }
 
-  async resetPassword(dto: UpdateUserDto) {
+  async resetPassword(dto: ResetPasswordDto) {
     const { token, password, email } = dto;
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
+    if (!user) {
+      console.log('사용자를 찾을 수 없습니다.');
+
+      throw new ApiException(ErrorCode.USER_NOT_FOUND);
+    }
     if (user && compareSync(password, user.password)) {
+      console.log('비밀번호가 동일합니다.');
+
       throw new ApiException(ErrorCode.SAME_ORIGINAL_PASSWORD);
     }
 
@@ -49,6 +68,11 @@ export class UserService {
         password: await hashSync(password, 10),
       },
     });
+    const redisData = await this.redis.getData(token);
+    if (!redisData) {
+      console.log('토큰이 유효하지 않습니다.');
+      throw new ApiException(ErrorCode.VERIFICATION_EMAIL_TOKEN_FAILED);
+    }
     await this.redis.deleteData(token);
     return null;
   }

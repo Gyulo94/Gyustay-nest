@@ -13,6 +13,8 @@ export enum ErrorCode {
   NOT_FOUND_EMAIL = 'USER_003',
   SAME_ORIGINAL_PASSWORD = 'USER_004',
   NOT_ALLOWED_SOCIAL_USER = 'USER_005',
+  VERIFICATION_EMAIL_TOKEN_FAILED = 'USER_006',
+  USER_ALREADY_EXISTS = 'USER_007',
 
   // 숙소 관련 에러
   ROOM_NOT_FOUND = 'ROOM_001',
@@ -82,6 +84,14 @@ export const ErrorCodeMap: Record<
   [ErrorCode.SAME_ORIGINAL_PASSWORD]: {
     status: HttpStatus.CONFLICT,
     message: '기존 비밀번호와 동일합니다.',
+  },
+  [ErrorCode.VERIFICATION_EMAIL_TOKEN_FAILED]: {
+    status: HttpStatus.UNAUTHORIZED,
+    message: '이메일 인증 토큰이 유효하지 않습니다.',
+  },
+  [ErrorCode.USER_ALREADY_EXISTS]: {
+    status: HttpStatus.CONFLICT,
+    message: '이미 존재하는 유저입니다.',
   },
 
   // 숙소 관련
