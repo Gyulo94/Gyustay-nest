@@ -12,6 +12,7 @@ import { RedisService } from 'src/redis/redis.service';
 import * as uuid from 'uuid';
 
 interface EmailOptions {
+  from: string;
   to: string;
   subject: string;
   html: string;
@@ -83,6 +84,7 @@ export class EmailService {
     const buttonText = type === 'signup' ? '회원가입' : '비밀번호 찾기';
 
     return {
+      from: '"GyuStay 서비스" <gyustay2025@gmail.com>',
       to: email,
       subject,
       html: `

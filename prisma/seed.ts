@@ -15,7 +15,7 @@ async function seedUsers() {
     const response = await prisma.user.create({
       data: userData,
     });
-    console.log(response);
+    // console.log(response);
   });
 }
 
@@ -51,7 +51,7 @@ async function seedCategories() {
         name: category,
       },
     });
-    console.log(response);
+    // console.log(response);
   });
 }
 
@@ -102,7 +102,7 @@ async function seedRooms() {
       const response = await prisma.room.create({
         data: roomData,
       });
-      console.log(response);
+      // console.log(response);
     }
   }
 }

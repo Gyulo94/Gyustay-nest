@@ -30,8 +30,6 @@ export class AuthController {
   @Post('reset-password')
   @Message(ResponseMessage.RESET_PASSWORD_SUCCESS)
   async resetPassword(@Body() dto: ResetPasswordDto) {
-    console.log('dto', dto);
-
     return await this.userService.resetPassword(dto);
   }
 

@@ -50,13 +50,9 @@ export class UserService {
       where: { email },
     });
     if (!user) {
-      console.log('사용자를 찾을 수 없습니다.');
-
       throw new ApiException(ErrorCode.USER_NOT_FOUND);
     }
     if (user && compareSync(password, user.password)) {
-      console.log('비밀번호가 동일합니다.');
-
       throw new ApiException(ErrorCode.SAME_ORIGINAL_PASSWORD);
     }
 
@@ -70,7 +66,6 @@ export class UserService {
     });
     const redisData = await this.redis.getData(token);
     if (!redisData) {
-      console.log('토큰이 유효하지 않습니다.');
       throw new ApiException(ErrorCode.VERIFICATION_EMAIL_TOKEN_FAILED);
     }
     await this.redis.deleteData(token);
