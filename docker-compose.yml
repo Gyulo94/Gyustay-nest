@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  gyustay-db:
     image: postgres:16.8
     restart: always
     environment:
@@ -14,8 +14,10 @@ services:
       - db_data:/var/lib/postgresql/data
     env_file:
       - .env
+    networks:
+      - gyubuntu_net
 
-  server:
+  gyustay-server:
     build: .
     restart: always
     env_file:
@@ -27,12 +29,14 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
     ports:
-      - '8010:8010'
+      - '8010:8000'
     depends_on:
-      - db
-      - redis
+      - gyustay-db
+      - gyustay-redis
+    networks:
+      - gyubuntu_net
 
-  redis:
+  gyustay-redis:
     image: redis:latest
     restart: always
     # ports:
@@ -46,8 +50,14 @@ services:
       timeout: 3s
       retries: 5
       start_period: 5s
+    networks:
+      - gyubuntu_net
 
 volumes:
   db_data:
   redisdata:
     driver: local
+
+networks:
+  gyubuntu_net:
+    external: true
