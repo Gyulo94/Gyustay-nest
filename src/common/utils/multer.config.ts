@@ -10,7 +10,7 @@ export class MulterConfigService implements MulterOptionsFactory {
   dirPath: string;
   baseUrl: string;
   constructor() {
-    this.dirPath = path.join(process.cwd(), 'uploads/temp');
+    this.dirPath = path.join('/app/uploads', 'temp');
     this.baseUrl = `${process.env.SERVER_URL}/uploads/temp`;
     this.mkdir();
   }

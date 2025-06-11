@@ -131,7 +131,7 @@ export class UserService {
             `${process.env.SERVER_URL}/`,
             '',
           );
-          const oldImageFullPath = path.join(process.cwd(), oldImagePath);
+          const oldImageFullPath = path.join('/app/uploads', oldImagePath);
           if (fs.existsSync(oldImageFullPath)) {
             await fs.promises.unlink(oldImageFullPath);
           }
@@ -141,7 +141,7 @@ export class UserService {
       }
 
       const updateUserId = updateUser.id;
-      const userDir = path.join(process.cwd(), 'uploads/users', updateUserId);
+      const userDir = path.join('/app/uploads', 'users', updateUserId);
       if (!fs.existsSync(userDir)) {
         fs.mkdirSync(userDir, { recursive: true });
       }
@@ -149,11 +149,7 @@ export class UserService {
       const imageFilename = path.basename(image);
       const ext = path.extname(imageFilename);
       const newImageFilename = `${updateUser.name}_${Date.now()}${ext}`;
-      const imageTempPath = path.join(
-        process.cwd(),
-        'uploads/temp',
-        imageFilename,
-      );
+      const imageTempPath = path.join('/app/uploads', 'temp', imageFilename);
 
       const imageFinalPath = path.join(userDir, newImageFilename);
 

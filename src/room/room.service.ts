@@ -348,8 +348,8 @@ export class RoomService {
     for (const oldImageUrl of imagesToDelete) {
       const imageFilename = path.basename(oldImageUrl);
       const imagePath = path.join(
-        process.cwd(),
-        'uploads/images/rooms',
+        '/app/uploads',
+        'images/rooms',
         id,
         imageFilename,
       );
@@ -368,7 +368,7 @@ export class RoomService {
     }
 
     const movedImages = [];
-    const dir = path.join(process.cwd(), 'uploads/images/rooms', id);
+    const dir = path.join('/app/uploads', 'images/rooms', id);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -377,11 +377,7 @@ export class RoomService {
       if (image.includes('/uploads/temp/')) {
         const imageFilename = path.basename(image);
         const newImageFilename = `${id}_${Date.now()}_${imageFilename}`;
-        const imageTempPath = path.join(
-          process.cwd(),
-          'uploads/temp',
-          imageFilename,
-        );
+        const imageTempPath = path.join('/app/uploads', 'temp', imageFilename);
         const imageFinalPath = path.join(dir, newImageFilename);
 
         try {
@@ -401,11 +397,7 @@ export class RoomService {
 
   private async deletedImages(rooms: Room[]) {
     for (const room of rooms) {
-      const dir = path.join(
-        process.cwd(),
-        'uploads/images/rooms',
-        room.id.toString(),
-      );
+      const dir = path.join('/app/uploads', 'images/rooms', room.id.toString());
       try {
         if (fs.existsSync(dir)) {
           await fs.promises.rm(dir, { recursive: true, force: true });
