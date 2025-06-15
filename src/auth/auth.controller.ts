@@ -58,13 +58,21 @@ export class AuthController {
 
   @UseGuards(RefreshJwtGuard)
   @Post('refresh')
-  async refresh(@CurrentUser() user: Payload) {
-    return await this.authService.refreshToken(user);
+  async refresh(
+    @Body('oldRefreshToken') oldRefreshToken: string,
+    @CurrentUser() user: Payload,
+  ) {
+    return await this.authService.refreshToken(oldRefreshToken, user);
   }
 
   @Post('social-login')
   @Message(ResponseMessage.LOGIN_SUCCESS)
   async socialLogin(@Body() dto: CreateUserDto) {
     return await this.authService.socialLogin(dto);
+  }
+
+  @Post('logout')
+  async logout(@Body('userId') userId: string) {
+    return await this.authService.logout(userId);
   }
 }

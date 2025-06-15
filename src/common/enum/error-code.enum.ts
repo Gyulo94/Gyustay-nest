@@ -15,6 +15,7 @@ export enum ErrorCode {
   NOT_ALLOWED_SOCIAL_USER = 'USER_005',
   VERIFICATION_EMAIL_TOKEN_FAILED = 'USER_006',
   USER_ALREADY_EXISTS = 'USER_007',
+  INVALID_REFRESH_TOKEN = 'USER_008',
 
   // 숙소 관련 에러
   ROOM_NOT_FOUND = 'ROOM_001',
@@ -92,6 +93,10 @@ export const ErrorCodeMap: Record<
   [ErrorCode.USER_ALREADY_EXISTS]: {
     status: HttpStatus.CONFLICT,
     message: '이미 존재하는 유저입니다.',
+  },
+  [ErrorCode.INVALID_REFRESH_TOKEN]: {
+    status: HttpStatus.UNAUTHORIZED,
+    message: '유효하지 않거나 만료된 리프레시 토큰입니다.',
   },
 
   // 숙소 관련

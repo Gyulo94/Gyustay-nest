@@ -29,19 +29,46 @@ export class AuthService {
       id: user.id,
       role: user.role,
     };
+    const serverTokens = await this.generateTokens(payload);
+    await this.redis.setData(
+      `refreshToken:${user.id}`,
+      serverTokens.refreshToken,
+      REFRESH_TOKEN_EXPIRES_IN,
+    );
     return {
       user,
-      serverTokens: await this.generateTokens(payload),
+      serverTokens,
     };
   }
 
-  async refreshToken(user: Payload) {
+  async refreshToken(oldRefreshToken: string, user: Payload) {
+    const raceKey = `raceConditionHelper:${oldRefreshToken}`;
+    const cached = await this.redis.getData(raceKey);
+
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const valid = await this.redis.getData(`refreshToken:${user.id}`);
+    if (!valid || valid !== oldRefreshToken) {
+      throw new ApiException(ErrorCode.INVALID_REFRESH_TOKEN);
+    }
+
     const payload = {
       id: user.id,
       role: user.role,
     };
 
-    return await this.generateTokens(payload);
+    const newTokens = await this.generateTokens(payload);
+
+    await this.redis.setData(
+      `refreshToken:${user.id}`,
+      newTokens.refreshToken,
+      REFRESH_TOKEN_EXPIRES_IN,
+    );
+
+    await this.redis.setData(raceKey, JSON.stringify(newTokens), 1);
+    return newTokens;
   }
 
   private async generateTokens(payload: Payload) {
@@ -93,5 +120,10 @@ export class AuthService {
       user,
       serverTokens: await this.generateTokens(payload),
     };
+  }
+
+  async logout(userId: string) {
+    await this.redis.deleteData(`refreshToken:${userId}`);
+    return null;
   }
 }
