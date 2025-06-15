@@ -31,7 +31,7 @@
     - Redis
 
 - **인프라**
-    - Ubuntu 20.24
+    - Ubuntu 20.04
     - Nginx
     - docker
 
